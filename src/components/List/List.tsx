@@ -8,7 +8,7 @@ export default function List() {
     <div className="list">
       {!store.state.items.length && <p className="no-items">Ничего нет ✅</p>}
       <ul className="items">
-        {store.state.items.map((item: any, i: number) => {
+        {store.state.items.map((item: string, i: number) => {
           return <li key={item}>{item}<button aria-label="❌" onClick={() => handleClick(i)}>❌</button></li>
         })}
       </ul>

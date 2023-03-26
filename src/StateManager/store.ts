@@ -1,19 +1,40 @@
 import Control from "./control";
+import { IActions } from "./store/actions";
+import { IMutations } from "./store/mutations";
 import state from "./store/state";
 
 export interface IState {
-  items: string[];
+  [key: string]: string[];
 }
 
-export default class Store {
-  actions: any;
-  mutations: any;
+export interface IParams {
+  actions: IActions;
+  mutations: IMutations;
+  state: IState;
+}
+
+export type TPayload = string & { i: number }
+
+
+export interface IStore {
+  actions: IActions;
+  mutations: IMutations;
   state: IState;
   status: string;
   events: Control;
-  constructor(params: any) {
-    this.actions = {};
-    this.mutations = {};
+  dispatch(actionKey: keyof IActions, payload: TPayload): boolean
+  commit(mutationKey: keyof IMutations, payload: TPayload): boolean
+}
+
+export default class Store implements IStore {
+  actions: IActions;
+  mutations: IMutations;
+  state: IState;
+  status: string;
+  events: Control;
+  constructor(params: IParams) {
+    this.actions = {} as IActions;
+    this.mutations = {} as IMutations;
     this.state = state;
     this.status = 'resting';
     this.events = new Control();
@@ -26,7 +47,7 @@ export default class Store {
     }
     const self = this
     this.state = new Proxy((params.state || {}), {
-      set: function (state, key, value) {
+      set: function (state, key: string, value) {
         state[key] = value;
         console.log(`Изменения состояния: ${key.toString()}: ${value}`);
         self.events.publish('stateChange', self.state);
@@ -38,7 +59,7 @@ export default class Store {
       }
     });
   }
-  dispatch(actionKey: any, payload: any) {
+  dispatch(actionKey: keyof IActions, payload: TPayload): boolean {
     if (typeof this.actions[actionKey] !== 'function') {
       console.error(`Экшна "${actionKey} не существует`);
       return false;
@@ -48,7 +69,7 @@ export default class Store {
     this.actions[actionKey](this, payload);
     return true;
   }
-  commit(mutationKey: any, payload: any) {
+  commit(mutationKey: keyof IMutations, payload: TPayload): boolean {
     if (typeof this.mutations[mutationKey] !== 'function') {
       console.error(`Мутации "${mutationKey}" не существует`);
       return false;

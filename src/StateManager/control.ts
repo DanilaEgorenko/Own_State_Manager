@@ -1,20 +1,28 @@
+import { IState } from "./store";
+
+export interface IEvents {
+  [key: string]: Function[];
+}
+
 export default class Control {
-  events: any;
+  events: IEvents;
   constructor() {
     this.events = {};
   }
 
-  subscribe(event: any, callback: any) {
+  subscribe(event: string, callback: Function) {
     if (!this.events.hasOwnProperty(event)) {
       this.events[event] = [];
     }
     return this.events[event].push(callback);
   }
 
-  publish(event: any, data: any = {}) {
+  publish(event: string, data: IState = {
+    items: []
+  }) {
     if (!this.events.hasOwnProperty(event)) {
       return [];
     }
-    return this.events[event].map((callback: any) => callback(data));
+    return this.events[event].map((callback: Function) => callback(data));
   }
 }

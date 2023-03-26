@@ -1,8 +1,15 @@
+import { IStore } from "../store";
+
+export interface IActions {
+  addItem(context: IStore, payload: string): void
+  clearItem(context: IStore, payload: { i: number }): void
+}
+
 export default {
-  addItem(context: any, payload: any) {
+  addItem(context: IStore, payload: string): void {
     context.commit('addItem', payload);
   },
-  clearItem(context: any, payload: any) {
+  clearItem(context: IStore, payload: { i: number }): void {
     context.commit('clearItem', payload);
   }
 };
